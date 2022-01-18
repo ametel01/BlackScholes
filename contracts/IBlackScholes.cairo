@@ -79,6 +79,5 @@ namespace IBlackScholes:
         rate : Uint256
     ) -> (callPrice : Uint256, putPrice : Uint256):
     end
-
 end
 
