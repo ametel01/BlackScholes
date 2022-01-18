@@ -5,16 +5,16 @@ from starkware.cairo.common.uint256 import Uint256
 @contract_interface
 namespace IBlackScholes:
 
-    func abs_val(x : Uint256) -> (val : Uint256):
+    func abs_val(x : Uint256) -> (res : Uint256):
     end
 
-    func exp(x : Uint256) -> (val : Uint256):
+    func exp(x : Uint256) -> (res : Uint256):
     end
 
-    func sqrt(x : Uint256) -> (val : Uint256):
+    func sqrt(x : Uint256) -> (res : Uint256):
     end
 
-    func ln(x : Uint256) -> (val : Uint256):
+    func ln(x : Uint256) -> (res : Uint256):
     end
 
     func d1d2(
