@@ -62,7 +62,7 @@ namespace IBlackScholes:
     ) -> (callRho : Uint256, putRho : Uint256):
     end
 
-        func theta(
+    func theta(
         tAnnualised : Uint256,
         volatility : Uint256,
         spot : Uint256,
