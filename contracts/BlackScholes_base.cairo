@@ -74,6 +74,26 @@ func ln{
     return (res)
 end
 
+#
+# @dev Returns the exponent of the value using taylor expansion with range reduction.
+#
+@external
+func exp{
+        syscall_ptr : felt*, 
+        pedersen_ptr : HashBuiltin*, 
+        range_check_ptr
+    }(x : Uint256) -> (res : Uint256):
+    alloc_locals
+    local res : Uint256
+    %{
+        import math
+        assert ids.x <= MAX_EXP
+        if x == 0:
+            ids.res = PRECISE_UNIT
+        ids.res = math.exp(ids.x) 
+    %}
+    return (res)
+ends
 
 
 
