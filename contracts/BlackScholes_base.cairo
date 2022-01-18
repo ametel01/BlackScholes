@@ -93,7 +93,7 @@ func exp{
         ids.res = math.exp(ids.x) 
     %}
     return (res)
-ends
+end
 
 
 
