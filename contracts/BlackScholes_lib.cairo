@@ -152,6 +152,8 @@ func std_normal_CDF(x : felt) -> (res : felt):
     %{
         if x < MIN_CDF_STD_DIST_INPUT:
             return PRECISE_UNIT
+        if x > MAX_CDF_STD_DIST_INPUT:
+            return PRECISE_UNIT
         t1 = (1e7 + ((2315419 * abs(x)) / PRECISE_UNIT))
         exponent = x * (x / 2)
         d = (3989423 * PRECISE_UNIT) / exp(exponent)
@@ -160,6 +162,10 @@ func std_normal_CDF(x : felt) -> (res : felt):
                     ((-3565638 + ((17814780 + ((-18212560 + (13302740 * 1e7) / t1) * 1e7) / t1) * 1e7) / t1) * 1e7) / 
                     t1) * 
                 1e7) / t1
+        if x > 0:
+            prob = 1e14 - prob
+        ids.res = (PRECISE_UNIT * prob) / 1e14
+        return (res)   
     %}
     return (res)
 end
