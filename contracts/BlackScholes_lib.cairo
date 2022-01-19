@@ -177,7 +177,7 @@ func _option_price(
     let strikeNd2 = strikePV * std_normal_CDF(d2)
     let (n2_vs_n1) = is_le(strikeNd2, spotNd1)
 
-    local _call
+    local _call : felt
     if n2_vs_n1 != 0:
         assert _call = spotNd1 - strikeNd2
     else:
