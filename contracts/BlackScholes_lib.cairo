@@ -1,9 +1,6 @@
 %lang starknet
 
 from starkware.cairo.common.cairo_builtins import HashBuiltin
-from starkware.cairo.common.uint256 import (
-    Uint256, uint256_add, uint256_sub, uint256_lt, uint256_eq, uint256_check
-)
 
 #
 # Constants
@@ -28,28 +25,21 @@ const VEGA_STANDARDISATION_MIN_DAYS = 7 # days TODO
 #
 # @dev Returns absolute value of an int as a uint.
 #
-@external
-func abs_val{
-        syscall_ptr : felt*, 
-        pedersen_ptr : HashBuiltin*, 
-        range_check_ptr
-    }(x : Uint256) -> (res : Uint256):
+func abs_val(x : felt) -> (res : felt):
     alloc_locals
-    local res : Uint256
+    local res
     %{
         ids.res = abs(x)
     %}
     return (res)
 end
 
+#
 # @dev Returns the floor of a PRECISE_UNIT (x - (x % 1e27))
-func floor{
-        syscall_ptr : felt*, 
-        pedersen_ptr : HashBuiltin*, 
-        range_check_ptr
-    }(x : Uint256) -> (res : Uint256):
+#
+func floor(x : felt) -> (res : felt):
     alloc_locals
-    local res : Uint256
+    local res
     %{
         ids.res = x - (x % PRECISE_UNIT)
     %}
@@ -59,14 +49,9 @@ end
 #
 # @dev Returns the natural log of the value using Halley's method.
 #
-@external
-func ln{
-        syscall_ptr : felt*, 
-        pedersen_ptr : HashBuiltin*, 
-        range_check_ptr
-    }(x : Uint256) -> (res : Uint256):
+func ln(x : felt) -> (res : felt):
     alloc_locals
-    local res : Uint256
+    local res 
     %{
         import math
         ids.res = math.log(x)
@@ -77,23 +62,47 @@ end
 #
 # @dev Returns the exponent of the value using taylor expansion with range reduction.
 #
-@external
-func exp{
-        syscall_ptr : felt*, 
-        pedersen_ptr : HashBuiltin*, 
-        range_check_ptr
-    }(x : Uint256) -> (res : Uint256):
+func exp(x : felt) -> (res : felt):
     alloc_locals
-    local res : Uint256
+    local res 
     %{
-        import math
-        assert ids.x <= MAX_EXP
+        assert x <= MAX_EXP
         if x == 0:
-            ids.res = PRECISE_UNIT
-        ids.res = math.exp(ids.x) 
+            return PRECISE_UNIT
+        elif x < MIN_EXP:
+            return 0
+        else:
+            return PRECISE_UNIT / exp(-x)
+        return math.exp(x) 
     %}
     return (res)
 end
+
+#
+# @dev Returns the square root of the value. This ignores the unit, so numbers should be
+# multiplied by their unit before being passed in.
+func sqrt(x : felt) -> (res : felt);
+    alloc_locals
+    local res
+    %{
+        ids.res = math.sqrt(x)
+    %}
+    return (res)
+end
+
+#
+# @dev Returns the square root of the value
+#
+func sqrt_precise(x : felt) -> (res : felt):
+    alloc_locals
+    local res
+    %{
+        ids.res = math.sqrt(x * PRECISE_UNIT)
+    %}
+    return (res)
+end
+
+
 
 
 
