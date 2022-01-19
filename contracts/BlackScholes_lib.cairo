@@ -177,6 +177,8 @@ func annualise(secs : felt) -> (res : felt):
     return (res)
 end
 
+func _option_price(
+
 
 
 
