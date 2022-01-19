@@ -32,10 +32,14 @@ func d1d2{
         strike : felt,
         rate : felt
     ) -> (d1 : felt, d2 : felt):
-    if assert(
-    let vt_sqrt = volatility * sqrt_precise(tAnnualised)
+    # @dev the following should be implemented:
+    # if tAnnulised < MIN_T_ANNUALISED:
+    #   tAnnualised = MIN_T_ANNUALISED
+    # if volatility < MIN_VOLATILITY:
+    #   volatility = MIN_VOLATILITY
+    let vt_sqrt = volatility * sqrt_precise(tAnnualised2)
     let log = ln(spot / strike)
-    let v2t = (volatility + rate) * tAnnualised
+    let v2t = (volatility + rate) * tAnnualised2
     let (d1) = (log + v2t) / vt_sqrt
     let (d2) = d1 - vt_sqrt
     return (d1, d2)
