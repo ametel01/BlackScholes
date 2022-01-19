@@ -27,24 +27,23 @@ const VEGA_STANDARDISATION_MIN_DAYS = 7 # days TODO
 #
 # @dev Returns absolute value of an int as a uint.
 #
-func abs_val(x : felt) -> (res : felt):
+func abs_val{range_check_ptr}(x : felt) -> (res : felt):
     alloc_locals
-    local res : felt
-    %{
-        ids.res = abs(ids.x)
-    %}
-    return (res)
+    local res
+    let (x_gt_ze) = is_le(x, 0)
+    if x_gt_ze != 1:
+        assert res = x
+    else:
+        assert res = -x
+    end
+    return(res)
 end
 
 #
 # @dev Returns the floor of a PRECISE_UNIT (x - (x % 1e27))
 #
 func floor(x : felt) -> (res : felt):
-    alloc_locals
-    local res : felt
-    %{
-        ids.res = ids.x - (ids.x % PRECISE_UNIT)
-    %}
+    let res = x - (x % PRECISE_UNIT)
     return (res)
 end
 
