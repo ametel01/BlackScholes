@@ -136,7 +136,7 @@ func std_normal(x : felt) -> (res : felt):
     alloc_locals
     local res
     %{
-        ids.res = exp((-x * (x / 2) / SQRT_TWOPI)
+        ids.res = exp((-x * (x / 2) / SQRT_TWOPI))
     %}
     return (res)
 end
@@ -165,11 +165,17 @@ func std_normal_CDF(x : felt) -> (res : felt):
         if x > 0:
             prob = 1e14 - prob
         ids.res = (PRECISE_UNIT * prob) / 1e14
-        return (res)   
     %}
     return (res)
 end
 
+#
+# @dev Converts an integer number of seconds to a fractional number of years.
+#
+func annualise(secs : felt) -> (res : felt):
+   let (res) = secs / SECONDS_PER_YEAR 
+    return (res)
+end
 
 
 
