@@ -38,12 +38,17 @@ func reverse_felt{
     let ans2 = ans1 + mod
     let (q, _) = unsigned_div_rem(x, 10)
     let (res) = reverse_felt(q, ans2)
-    #serialize_word(res)
+    return(res)
+end
+
+func modulus{output_ptr : felt*, range_check_ptr}(x : felt, mod : felt) -> (res : felt):    
+    let (_, rem) = unsigned_div_rem(x, mod)
+    let res = rem
     return(res)
 end
     
 
-func div{output_ptr : felt*,range_check_ptr}(a : felt, b : felt, i : felt) -> (res : felt):
+func _div{output_ptr : felt*, range_check_ptr}(a : felt, b : felt, i : felt) -> (res : felt):
     alloc_locals
     local q1 : felt
     let (cond) = is_le(i, 0)
@@ -51,14 +56,17 @@ func div{output_ptr : felt*,range_check_ptr}(a : felt, b : felt, i : felt) -> (r
         return(0)
     end
     let (q, r) = unsigned_div_rem(a, b)
-    #serialize_word(q)
     assert q1 = q
-    #let new_q = r*10
-    let (curr_sum) = div(r*10, b, i-1)
+    let (curr_sum) = _div(r*10, b, i-1)
     let (mod) = modulus(curr_sum, 10)
     let sum = q1 + curr_sum*10
-    let (res) = reverse_felt(sum,0) 
     
+    return(sum)
+end
+
+func div{output_ptr : felt*, range_check_ptr}(x : felt, y : felt) -> (res : felt):
+    let (res0) = _div(x, y, 18)
+    let (res) = reverse_felt(res0,0)
     return(res)
 end
 
