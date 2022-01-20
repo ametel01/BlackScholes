@@ -1,15 +1,16 @@
 %lang starknet
 
 from starkware.cairo.common.cairo_builtins import HashBuiltin
-from starkware.cairo.common.math import sqrt
+from starkware.cairo.common.math import (sqrt, unsigned_div_rem, abs_value)
 from starkware.cairo.common.math_cmp import is_le
+from starkware.cairo.common.pow import pow
 
 #
 # Constants
 #
 
 const SECONDS_PER_YEAR = 31536000
-const PRECISE_UNIT = 1000000000000000000000000000
+const PRECISE_UNIT = 10**18
 const LN_2_PRECISE = 693147180559945309417232122
 const SQRT_TWOPI = 2506628274631000502415765285
 const MIN_CDF_STD_DIST_INPUT = ((PRECISE_UNIT) * -45) / 10
@@ -19,31 +20,61 @@ const MAX_EXP = 100 * PRECISE_UNIT
 const MIN_T_ANNUALISED = PRECISE_UNIT / SECONDS_PER_YEAR
 const MIN_VOLATILITY = PRECISE_UNIT / 10000
 const VEGA_STANDARDISATION_MIN_DAYS = 7 # days TODO
+const EULER = 2718281828459045235360287471
 
 #
 # Math
 #
-
-#
-# @dev Returns absolute value of an int as a uint.
-#
-func abs_val{range_check_ptr}(x : felt) -> (res : felt):
-    alloc_locals
-    local res
-    let (x_gt_ze) = is_le(x, 0)
-    if x_gt_ze != 1:
-        assert res = x
-    else:
-        assert res = -x
+func reverse_felt{
+    output_ptr : felt*,
+    range_check_ptr
+        }(x : felt, ans : felt) -> (res : felt):
+    let (cond) = is_le(x, 0)
+    if cond != 0:
+        return(ans)
     end
+    let ans1 = ans*10
+    let (mod) = modulus(x, 10)
+    let ans2 = ans1 + mod
+    let (q, _) = unsigned_div_rem(x, 10)
+    let (res) = reverse_felt(q, ans2)
+    #serialize_word(res)
+    return(res)
+end
+    
+
+func div{output_ptr : felt*,range_check_ptr}(a : felt, b : felt, i : felt) -> (res : felt):
+    alloc_locals
+    local q1 : felt
+    let (cond) = is_le(i, 0)
+    if cond != 0:
+        return(0)
+    end
+    let (q, r) = unsigned_div_rem(a, b)
+    #serialize_word(q)
+    assert q1 = q
+    #let new_q = r*10
+    let (curr_sum) = div(r*10, b, i-1)
+    let (mod) = modulus(curr_sum, 10)
+    let sum = q1 + curr_sum*10
+    let (res) = reverse_felt(sum,0) 
+    
+    return(res)
+end
+
+
+func modulus{range_check_ptr}(x : felt, mod : felt) -> (res : felt):    
+    let (_, rem) = unsigned_div_rem(x, mod)
+    let res = rem
     return(res)
 end
 
 #
 # @dev Returns the floor of a PRECISE_UNIT (x - (x % 1e27))
 #
-func floor(x : felt) -> (res : felt):
-    let res = x - (x % PRECISE_UNIT)
+func floor{range_check_ptr}(x : felt) -> (res : felt):
+    let (x_mod) = modulus(x, PRECISE_UNIT)
+    let res = x - x_mod
     return (res)
 end
 
@@ -63,29 +94,9 @@ end
 #
 # @dev helper function for exp.
 #
-func _exp(x : felt) -> (res : felt):
-    alloc_locals
-    local res : felt
-    %{
-        assert ids.x <= MAX_EXP
-        if ids.x == 0:
-            return PRECISE_UNIT
-        k = floor(ids.x / LN_2_PRECISE) / PRECISE_UNIT
-        p = 2**k
-        r = ids.x - (k * LN_2_PRECISE)
-        
-        i = 16
-        _T = PRECISE_UNIT
-        last_T = 0
-        while i > 0:
-            _T = (_T * (r / i)) + PRECISE_UNIT
-            if _T == last_T:
-                break
-            last_T = _T
-            i -= 1
-        ids.res = p * _T 
-    %}
-    return (res)
+func exp(x : felt) -> (res : felt):
+    let r = pow(EULER, x)
+    return (r)
 end
 
 #
@@ -197,6 +208,8 @@ end
 
 
 
+4,1
+0, 1
 
 
 
