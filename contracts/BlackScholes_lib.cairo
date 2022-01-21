@@ -11,8 +11,8 @@ from starkware.cairo.common.pow import pow
 
 const SECONDS_PER_YEAR = 31536000
 const PRECISE_UNIT = 10**18
-const LN_2_PRECISE = 693147180559945309417232122
-const SQRT_TWOPI = 2506628274631000502415765285
+const LN_2_PRECISE = 693147180559945309
+const SQRT_TWOPI = 2506628274631000502
 const MIN_CDF_STD_DIST_INPUT = ((PRECISE_UNIT) * -45) / 10
 const MAX_CDF_STD_DIST_INPUT = PRECISE_UNIT * 10
 const MIN_EXP = -63 * PRECISE_UNIT
@@ -20,7 +20,7 @@ const MAX_EXP = 100 * PRECISE_UNIT
 const MIN_T_ANNUALISED = PRECISE_UNIT / SECONDS_PER_YEAR
 const MIN_VOLATILITY = PRECISE_UNIT / 10000
 const VEGA_STANDARDISATION_MIN_DAYS = 7 # days TODO
-const EULER = 2718281828459045235360287471
+
 
 #
 # Math
@@ -64,16 +64,9 @@ func _div{output_ptr : felt*, range_check_ptr}(a : felt, b : felt, i : felt) -> 
     return(sum)
 end
 
-func div{output_ptr : felt*, range_check_ptr}(x : felt, y : felt) -> (res : felt):
+func division{output_ptr : felt*, range_check_ptr}(x : felt, y : felt) -> (res : felt):
     let (res0) = _div(x, y, 18)
     let (res) = reverse_felt(res0,0)
-    return(res)
-end
-
-
-func modulus{range_check_ptr}(x : felt, mod : felt) -> (res : felt):    
-    let (_, rem) = unsigned_div_rem(x, mod)
-    let res = rem
     return(res)
 end
 
@@ -100,30 +93,7 @@ func ln(x : felt) -> (res : felt):
 end
 
 #
-# @dev helper function for exp.
-#
-func exp(x : felt) -> (res : felt):
-    let r = pow(EULER, x)
-    return (r)
-end
-
-#
-# @dev Returns the exponent of the value using taylor expansion with range reduction, 
-# with support for negative numbers.
-#
-func exp(x : felt) -> (res : felt):
-    alloc_locals
-    local res : felt
-    %{
-        if 0 <= x:
-            return _exp(ids.x)
-        elif ids.x < MIN_EXP:
-            return 0
-        else:
-            return PRECISE_UNIT / exp(-ids.x)
-    %}
-    return (res)
-end
+# @dev Returns the square root of the
 
 #
 # @dev Returns the square root of the value
@@ -140,7 +110,8 @@ func std_normal(x : felt) -> (res : felt):
     alloc_locals
     local res : felt
     %{
-        ids.res = exp((-ids.x * (ids.x / 2) / SQRT_TWOPI))
+        import math
+        ids.res = math.exp((-ids.x * (ids.x / 2) / SQRT_TWOPI))
     %}
     return (res)
 end
@@ -177,7 +148,7 @@ end
 # @dev Converts an integer number of seconds to a fractional number of years.
 #
 func annualise(secs : felt) -> (res : felt):
-   let (res) = secs / SECONDS_PER_YEAR 
+    let (res) = div(secs, SECONDS_PER_YEAR) 
     return (res)
 end
 
@@ -214,10 +185,6 @@ func _option_price(
     return (_call, put)
 end
 
-
-
-4,1
-0, 1
 
 
 
